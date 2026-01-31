@@ -1,4 +1,5 @@
 from app.database import db
+from google.cloud.firestore_v1.base_query import FieldFilter
 from app.user.model import User
 from typing import Optional
 
@@ -15,7 +16,7 @@ class UserService:
         return doc_ref.id
 
     def get_user_by_email(self, email: str) -> Optional[User]:
-        docs = self.collection.where('email', '==', email).limit(1).stream()
+        docs = self.collection.where(filter=FieldFilter('email', '==', email)).limit(1).stream()
         for doc in docs:
             return User.from_dict(doc.to_dict(), id=doc.id)
         return None

@@ -32,7 +32,7 @@ def api_star_wars(request):
         base_url=request.base_url,
         query_string=request.query_string,
         method=request.method,
-        headers=request.headers,
+        headers=dict(request.headers),
         data=request.get_data(),
     ):
         try:

@@ -1,4 +1,5 @@
 from app.database import db
+from google.cloud.firestore_v1.base_query import FieldFilter
 from app.favorites.model import Favorite
 from app.swapi_client import SWAPIClient
 from typing import List, Optional
@@ -10,9 +11,9 @@ class FavoriteService:
 
     def add_favorite(self, favorite: Favorite) -> str:
         # Check if already exists to avoid duplicates
-        existing = self.collection.where('user_id', '==', favorite.user_id)\
-                                 .where('entity_type', '==', favorite.entity_type)\
-                                 .where('entity_id', '==', favorite.entity_id)\
+        existing = self.collection.where(filter=FieldFilter('user_id', '==', favorite.user_id))\
+                                 .where(filter=FieldFilter('entity_type', '==', favorite.entity_type))\
+                                 .where(filter=FieldFilter('entity_id', '==', favorite.entity_id))\
                                  .limit(1).stream()
         
         for doc in existing:
@@ -27,7 +28,7 @@ class FavoriteService:
         return doc_ref.id
 
     def list_favorites(self, user_id: str) -> List[dict]:
-        docs = self.collection.where('user_id', '==', user_id).stream()
+        docs = self.collection.where(filter=FieldFilter('user_id', '==', user_id)).stream()
         favorites = []
         for doc in docs:
             fav = Favorite.from_dict(doc.to_dict(), id=doc.id)

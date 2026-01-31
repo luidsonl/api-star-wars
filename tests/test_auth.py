@@ -3,9 +3,8 @@ from unittest.mock import MagicMock
 from app.auth.service import AuthService
 
 def test_register_success(client, mock_db):
-    # Mock Firestore collection.add
-    mock_collection = MagicMock()
-    mock_db.collection.return_value = mock_collection
+    # Get the collection mock that UserService already has
+    mock_collection = mock_db.collection.return_value
     
     # Mock get_user_by_email to return None (user doesn't exist)
     # UserService uses self.collection.where('email', '==', email).limit(1).stream()
@@ -27,9 +26,8 @@ def test_register_success(client, mock_db):
     assert response.json['id'] == "test-user-id"
 
 def test_login_success(client, mock_db):
-    # Mock Firestore collection.where for get_user_by_email
-    mock_collection = MagicMock()
-    mock_db.collection.return_value = mock_collection
+    # Get the collection mock that UserService already has
+    mock_collection = mock_db.collection.return_value
     
     hashed_password = AuthService.hash_password("pass123")
     

@@ -5,7 +5,8 @@ from passlib.hash import bcrypt
 from typing import Optional
 
 # In production, this should be set in environment variables
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "star-wars-secret-key-123")
+# Minimum length for HS256 should be 32 bytes
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "star-wars-super-secret-key-that-is-at-least-32-chars-long")
 
 class AuthService:
     @staticmethod
@@ -18,9 +19,10 @@ class AuthService:
 
     @staticmethod
     def generate_token(user_id: str) -> str:
+        now = datetime.datetime.now(datetime.UTC)
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
-            'iat': datetime.datetime.utcnow(),
+            'exp': now + datetime.timedelta(days=1),
+            'iat': now,
             'sub': user_id
         }
         return jwt.encode(payload, SECRET_KEY, algorithm='HS256')

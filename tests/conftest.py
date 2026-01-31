@@ -44,6 +44,20 @@ def mock_db():
     return mock_firestore_client_instance
 
 @pytest.fixture(autouse=True)
+def patch_controllers(mock_db):
+    # This is necessary because services are instantiated at module level in controllers
+    from app.user.service import UserService
+    from app.favorites.service import FavoriteService
+    
+    # Create fresh services with the mock_db
+    test_user_service = UserService(database=mock_db)
+    test_favorite_service = FavoriteService(database=mock_db)
+    
+    with patch('app.auth.controller.user_service', test_user_service), \
+         patch('app.favorites.controller.favorite_service', test_favorite_service):
+        yield
+
+@pytest.fixture(autouse=True)
 def reset_mocks(mock_db):
     mock_db.reset_mock()
     yield

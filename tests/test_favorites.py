@@ -9,12 +9,11 @@ def test_add_favorite_success(client, mock_db):
     token = AuthService.generate_token(user_id)
     headers = {"Authorization": f"Bearer {token}"}
     
-    # Mock Firestore
-    mock_collection = MagicMock()
-    mock_db.collection.return_value = mock_collection
+    # Get the collection mock
+    mock_collection = mock_db.collection.return_value
     
     # Mock check if already exists
-    # FavoriteService uses: self.collection.where('user_id', '==', ...).where('entity_type', '==', ...).where('entity_id', '==', ...).limit(1).stream()
+    # FavoriteService uses: self.collection.where(...).where(...).where(...).limit(1).stream()
     mock_query = mock_collection.where.return_value.where.return_value.where.return_value.limit.return_value
     mock_query.stream.return_value = []
     
@@ -40,9 +39,8 @@ def test_list_favorites_success(client, mock_db):
     token = AuthService.generate_token(user_id)
     headers = {"Authorization": f"Bearer {token}"}
     
-    # Mock Firestore
-    mock_collection = MagicMock()
-    mock_db.collection.return_value = mock_collection
+    # Get the collection mock
+    mock_collection = mock_db.collection.return_value
     
     mock_fav_doc = MagicMock()
     mock_fav_doc.id = "fav-id"
@@ -52,7 +50,8 @@ def test_list_favorites_success(client, mock_db):
         "entity_id": "1"
     }
     
-    mock_collection.where.return_value.stream.return_value = [mock_fav_doc]
+    mock_query = mock_collection.where.return_value
+    mock_query.stream.return_value = [mock_fav_doc]
     
     # Mock SWAPI
     with requests_mock.Mocker() as m:

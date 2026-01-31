@@ -22,7 +22,6 @@ class SWAPIClient:
             elif response.status_code == 404:
                 return None
             else:
-                response.raise_for_status()
+                return None
         except requests.RequestException:
-            # For simplicity, we can log this and return None or re-raise
-            raise
+            return None

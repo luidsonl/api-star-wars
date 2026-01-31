@@ -16,7 +16,7 @@ class FavoriteService:
                                  .limit(1).stream()
         
         for doc in existing:
-            return doc.id
+            raise ValueError(f"Entity {favorite.entity_id} of type {favorite.entity_type} is already in favorites")
 
         # Validate entity exists in SWAPI
         entity = self.swapi_client.get_entity(favorite.entity_type, favorite.entity_id)

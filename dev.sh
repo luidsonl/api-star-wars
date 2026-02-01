@@ -10,4 +10,4 @@ export FIRESTORE_EMULATOR_HOST="[::1]:8480"
 # Cloud Project
 export GOOGLE_CLOUD_PROJECT="star-wars-api-test"
 
-functions-framework --target=api_star_wars --source=app/main.py --debug
+functions-framework --target=api_star_wars --source=main.py --debug

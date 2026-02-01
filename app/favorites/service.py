@@ -7,7 +7,7 @@ from typing import List, Optional
 class FavoriteService:
     def __init__(self, database=None):
         self.collection = (database or db).collection('favorites')
-        self.swapi_client = SWAPIClient()
+        self.swapi_client = SWAPIClient(database=database)
 
     def add_favorite(self, favorite: Favorite) -> str:
         # Check if already exists to avoid duplicates

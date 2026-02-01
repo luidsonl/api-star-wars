@@ -49,13 +49,17 @@ def patch_controllers(mock_db):
     from app.user.service import UserService
     from app.favorites.service import FavoriteService
     
-    # Create fresh services with the mock_db
-    test_user_service = UserService(database=mock_db)
-    test_favorite_service = FavoriteService(database=mock_db)
-    
-    with patch('app.auth.controller.user_service', test_user_service), \
-         patch('app.favorites.controller.favorite_service', test_favorite_service):
-        yield
+    with patch('app.swapi_client.SWAPICacheRepository') as mock_cache_repo:
+        # Ensure cache misses by default in all E2E tests
+        mock_cache_repo.return_value.get_cached_response.return_value = None
+        
+        # Create fresh services with the mock_db and the patched SWAPICacheRepository
+        test_user_service = UserService(database=mock_db)
+        test_favorite_service = FavoriteService(database=mock_db)
+        
+        with patch('app.auth.controller.user_service', test_user_service), \
+             patch('app.favorites.controller.favorite_service', test_favorite_service):
+            yield
 
 @pytest.fixture(autouse=True)
 def reset_mocks(mock_db):

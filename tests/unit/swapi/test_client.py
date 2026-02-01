@@ -138,3 +138,38 @@ def test_list_entities_with_sorting_unknown_numeric(swapi_client):
         assert data["results"][1]["name"] == "Artoo"
         assert data["results"][2]["name"] == "Luke"
 
+def test_substitute_urls(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = {
+        "count": 1,
+        "next": "https://swapi.dev/api/people/?page=2",
+        "previous": None,
+        "results": [
+            {
+                "name": "Luke Skywalker",
+                "homeworld": "https://swapi.dev/api/planets/1/",
+                "films": ["https://swapi.dev/api/films/1/"]
+            }
+        ]
+    }
+    
+    # Mock Flask request context
+    from flask import Flask
+    app = Flask(__name__)
+    with app.test_request_context(base_url='http://myhosting.com/api/'):
+        data = client.get_by_url("https://swapi.dev/api/people/1/")
+        
+        assert data["next"] == "http://myhosting.com/api/people/?page=2"
+        assert data["results"][0]["homeworld"] == "http://myhosting.com/api/planets/1/"
+        assert data["results"][0]["films"][0] == "http://myhosting.com/api/films/1/"
+
+def test_substitute_urls_no_context(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = {
+        "homeworld": "https://swapi.dev/api/planets/1/"
+    }
+    
+    # No request context
+    data = client.get_by_url("https://swapi.dev/api/people/1/")
+    # Should be relative
+    assert data["homeworld"] == "planets/1/"

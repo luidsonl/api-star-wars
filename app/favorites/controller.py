@@ -11,12 +11,70 @@ favorite_service = FavoriteService()
 @favorites_bp.route('/', methods=['GET'])
 @token_required
 def get_favorites(user_id):
+    """
+    List user favorites
+    ---
+    tags:
+      - Favorites
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: List of favorites
+        schema:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+              entity_type:
+                type: string
+              entity_id:
+                type: string
+      401:
+        description: Unauthorized
+    """
     favorites = favorite_service.list_favorites(user_id)
     return jsonify(favorites), 200
 
 @favorites_bp.route('/', methods=['POST'])
 @token_required
 def add_favorite(user_id):
+    """
+    Add a new favorite
+    ---
+    tags:
+      - Favorites
+    security:
+      - Bearer: []
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: FavoriteCreate
+          required:
+            - entity_type
+            - entity_id
+          properties:
+            entity_type:
+              type: string
+              enum: [people, planets, vehicles]
+            entity_id:
+              type: string
+    responses:
+      201:
+        description: Favorite added
+        schema:
+          properties:
+            id:
+              type: string
+            message:
+              type: string
+      400:
+        description: Invalid input
+      401:
+        description: Unauthorized
+    """
     try:
         data = request.get_json()
         if not data:
@@ -41,6 +99,26 @@ def add_favorite(user_id):
 @favorites_bp.route('/<favorite_id>', methods=['DELETE'])
 @token_required
 def delete_favorite(user_id, favorite_id):
+    """
+    Delete a favorite
+    ---
+    tags:
+      - Favorites
+    security:
+      - Bearer: []
+    parameters:
+      - name: favorite_id
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: Favorite removed
+      401:
+        description: Unauthorized
+      404:
+        description: Favorite not found or not owned by user
+    """
     success = favorite_service.remove_favorite(favorite_id, user_id)
     if success:
         return jsonify({"message": "Favorite removed"}), 200

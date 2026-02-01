@@ -1,7 +1,28 @@
 from flask import Flask, jsonify
+from flasgger import Swagger
 from app.routes import register_routes
 
 app = Flask(__name__)
+
+# Swagger configuration
+app.config['SWAGGER'] = {
+    'title': 'Star Wars API',
+    'uiversion': 3,
+    'description': 'API for managing Star Wars characters and favorites',
+    'contact': {
+        'name': 'API Support',
+        'url': 'http://www.example.com/support',
+        'email': 'support@example.com',
+    },
+    'license': {
+        'name': 'Apache 2.0',
+        'url': 'http://www.apache.org/licenses/LICENSE-2.0.html',
+    },
+    'version': '1.0.0',
+    'specs_route': '/apidocs/'
+}
+
+swagger = Swagger(app)
 register_routes(app)
 
 @app.errorhandler(404)

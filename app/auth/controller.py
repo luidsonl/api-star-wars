@@ -11,6 +11,42 @@ user_service = UserService()
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    """
+    User Registration
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: UserRegistration
+          required:
+            - email
+            - password
+            - name
+          properties:
+            email:
+              type: string
+              description: User's email address
+            password:
+              type: string
+              description: User's password
+            name:
+              type: string
+              description: User's full name
+    responses:
+      201:
+        description: User created successfully
+        schema:
+          properties:
+            id:
+              type: string
+            message:
+              type: string
+      400:
+        description: Invalid input or validation error
+    """
     try:
         data = request.get_json()
         if not data:
@@ -38,6 +74,36 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    """
+    User Login
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: UserLogin
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: Login successful, returns JWT token
+        schema:
+          properties:
+            token:
+              type: string
+      401:
+        description: Invalid email or password
+      400:
+        description: Invalid input
+    """
     try:
         data = request.get_json()
         if not data:

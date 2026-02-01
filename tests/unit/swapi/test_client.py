@@ -173,3 +173,30 @@ def test_substitute_urls_no_context(swapi_client):
     data = client.get_by_url("https://swapi.dev/api/people/1/")
     # Should be relative
     assert data["homeworld"] == "planets/1/"
+
+def test_list_entities_sorting_pagination(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = None
+    
+    with requests_mock.Mocker() as m:
+        url = "https://swapi.dev/api/people/"
+        m.get(url, json={
+            "next": None,
+            "results": [{"name": f"Person {i}", "height": str(i)} for i in range(1, 16)]
+        })
+        
+        from flask import Flask
+        app = Flask(__name__)
+        with app.test_request_context(base_url='http://myhosting.com/api/'):
+            # Fetch page 1 (items 1-10) sorted by height
+            data = client.list_entities("people", page=1, sort_by="height")
+            
+            assert data["count"] == 15
+            assert len(data["results"]) == 10
+            assert data["next"] == "http://myhosting.com/api/people/?page=2&sort_by=height"
+            assert data["previous"] is None
+            
+            # Fetch page 2 (items 11-15) sorted by height
+            data = client.list_entities("people", page=2, sort_by="height")
+            assert data["next"] is None
+            assert data["previous"] == "http://myhosting.com/api/people/?page=1&sort_by=height"

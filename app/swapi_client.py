@@ -133,10 +133,25 @@ class SWAPIClient:
             start = (page - 1) * page_size
             end = start + page_size
             
+            # Construct full URLs for next/previous links so they can be substituted correctly
+            next_url = None
+            if end < len(results):
+                next_url = f"{SWAPI_BASE_URL}/{entity_type}/?page={page + 1}"
+                if search:
+                    next_url += f"&search={search}"
+                next_url += f"&sort_by={sort_by}"
+
+            prev_url = None
+            if start > 0:
+                prev_url = f"{SWAPI_BASE_URL}/{entity_type}/?page={page - 1}"
+                if search:
+                    prev_url += f"&search={search}"
+                prev_url += f"&sort_by={sort_by}"
+
             data = {
                 "count": len(results),
-                "next": f"page={page + 1}" if end < len(results) else None,
-                "previous": f"page={page - 1}" if start > 0 else None,
+                "next": next_url,
+                "previous": prev_url,
                 "results": results[start:end]
             }
             return self._substitute_urls(data)

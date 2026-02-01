@@ -10,7 +10,15 @@ def not_found(e):
 
 @app.errorhandler(500)
 def internal_error(e):
-    return jsonify({"error": "Internal server error"}), 500
+    import traceback
+    traceback.print_exc()
+    
+    response = {"error": "Internal server error"}
+    if app.debug:
+        response["message"] = str(e)
+        response["traceback"] = traceback.format_exc()
+        
+    return jsonify(response), 500
 
 if __name__ == "__main__":
     # This is used when running locally only. When deploying to Google Cloud

@@ -13,8 +13,10 @@ class FirestoreProxy:
     @property
     def db(self):
         if self._db is None:
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            database_id = os.environ.get("FIRESTORE_DATABASE", "(default)")
             # This only fails if we actually try to use it without project ID
-            self._db = firestore.Client()
+            self._db = firestore.Client(project=project_id, database=database_id)
         return self._db
 
     def __getattr__(self, name):

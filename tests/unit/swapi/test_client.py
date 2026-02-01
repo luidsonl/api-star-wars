@@ -70,3 +70,71 @@ def test_get_by_url(swapi_client):
         data = client.get_by_url(url)
         assert data == expected_json
         mock_cache.cache_response.assert_called_once_with(url, expected_json)
+
+def test_get_all_entities(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = None
+    
+    with requests_mock.Mocker() as m:
+        url1 = "https://swapi.dev/api/people/"
+        url2 = "https://swapi.dev/api/people/?page=2"
+        
+        m.get(url1, json={
+            "next": url2,
+            "results": [{"name": "Luke"}]
+        })
+        m.get(url2, json={
+            "next": None,
+            "results": [{"name": "Vader"}]
+        })
+        
+        results = client.get_all_entities("people")
+        assert len(results) == 2
+        assert results[0]["name"] == "Luke"
+        assert results[1]["name"] == "Vader"
+
+def test_list_entities_with_sorting_numeric(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = None
+    
+    with requests_mock.Mocker() as m:
+        url = "https://swapi.dev/api/people/"
+        # Mocking get_all_entities indirectly by mocking the request
+        m.get(url, json={
+            "next": None,
+            "results": [
+                {"name": "Luke", "height": "172"},
+                {"name": "Yoda", "height": "66"},
+                {"name": "Chewie", "height": "228"}
+            ]
+        })
+        
+        # Sort by height ascending
+        data = client.list_entities("people", sort_by="height")
+        
+        assert data["results"][0]["name"] == "Yoda"   # 66
+        assert data["results"][1]["name"] == "Luke"   # 172
+        assert data["results"][2]["name"] == "Chewie" # 228
+
+def test_list_entities_with_sorting_unknown_numeric(swapi_client):
+    client, mock_cache = swapi_client
+    mock_cache.get_cached_response.return_value = None
+    
+    with requests_mock.Mocker() as m:
+        url = "https://swapi.dev/api/people/"
+        m.get(url, json={
+            "next": None,
+            "results": [
+                {"name": "Luke", "height": "172"},
+                {"name": "Artoo", "height": "96"},
+                {"name": "Unknown", "height": "unknown"}
+            ]
+        })
+        
+        # Sort by height ascending. 'unknown' should be at the beginning (float('-inf'))
+        data = client.list_entities("people", sort_by="height")
+        
+        assert data["results"][0]["name"] == "Unknown"
+        assert data["results"][1]["name"] == "Artoo"
+        assert data["results"][2]["name"] == "Luke"
+

@@ -35,8 +35,6 @@ def register():
         return jsonify(e.errors()), 400
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": "Internal server error"}), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -55,5 +53,3 @@ def login():
         return jsonify({"token": token}), 200
     except ValidationError as e:
         return jsonify(e.errors()), 400
-    except Exception as e:
-        return jsonify({"error": "Internal server error"}), 500

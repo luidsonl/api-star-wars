@@ -37,8 +37,6 @@ def add_favorite(user_id):
         return jsonify(e.errors()), 400
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": "Internal server error"}), 500
 
 @favorites_bp.route('/<favorite_id>', methods=['DELETE'])
 @token_required
@@ -48,5 +46,3 @@ def delete_favorite(user_id, favorite_id):
         if success:
             return jsonify({"message": "Favorite removed"}), 200
         return jsonify({"error": "Favorite not found or not owned by user"}), 404
-    except Exception as e:
-        return jsonify({"error": "Internal server error"}), 500

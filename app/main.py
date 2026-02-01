@@ -3,6 +3,7 @@ from flasgger import Swagger
 from app.routes import register_routes
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 # Swagger configuration
 app.config['SWAGGER'] = {

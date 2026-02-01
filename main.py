@@ -1,1 +1,1 @@
-from app.main import api_star_wars
+from app.main import api_star_wars, app

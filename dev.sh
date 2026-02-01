@@ -5,7 +5,7 @@ export PYTHONPATH=$PYTHONPATH:.
 export JWT_SECRET_KEY="star-wars-super-secret-key-that-is-at-least-32-chars-long"
 
 # Local Emulator
-export FIRESTORE_EMULATOR_HOST="[::1]:8971"
+export FIRESTORE_EMULATOR_HOST="127.0.0.1:8700"
 
 # Cloud Project
 export GOOGLE_CLOUD_PROJECT="star-wars-api-test"

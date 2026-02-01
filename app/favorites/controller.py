@@ -41,8 +41,7 @@ def add_favorite(user_id):
 @favorites_bp.route('/<favorite_id>', methods=['DELETE'])
 @token_required
 def delete_favorite(user_id, favorite_id):
-    try:
-        success = favorite_service.remove_favorite(favorite_id, user_id)
-        if success:
-            return jsonify({"message": "Favorite removed"}), 200
-        return jsonify({"error": "Favorite not found or not owned by user"}), 404
+    success = favorite_service.remove_favorite(favorite_id, user_id)
+    if success:
+        return jsonify({"message": "Favorite removed"}), 200
+    return jsonify({"error": "Favorite not found or not owned by user"}), 404

@@ -8,17 +8,28 @@ register_routes(app)
 def not_found(e):
     return jsonify({"error": "Resource not found"}), 404
 
-@app.errorhandler(500)
-def internal_error(e):
+@app.errorhandler(Exception)
+def handle_exception(e):
     import traceback
+    from werkzeug.exceptions import HTTPException
+    
     traceback.print_exc()
     
-    response = {"error": "Internal server error"}
+    # Use the status code of the HTTP error if it is one
+    code = 500
+    if isinstance(e, HTTPException):
+        code = e.code
+    
+    response = {
+        "error": "Internal server error" if code == 500 else getattr(e, 'name', 'Error'),
+        "status_code": code
+    }
+    
     if app.debug:
         response["message"] = str(e)
         response["traceback"] = traceback.format_exc()
         
-    return jsonify(response), 500
+    return jsonify(response), code
 
 if __name__ == "__main__":
     # This is used when running locally only. When deploying to Google Cloud

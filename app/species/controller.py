@@ -25,6 +25,18 @@ def get_species():
     responses:
       200:
         description: List of species
+        schema:
+          properties:
+            count:
+              type: integer
+            next:
+              type: string
+            previous:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Species'
     """
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search')
@@ -50,8 +62,48 @@ def get_specie(species_id):
     responses:
       200:
         description: Species details
+        schema:
+          $ref: '#/definitions/Species'
       404:
         description: Species not found
+    definitions:
+      Species:
+        type: object
+        properties:
+          name:
+            type: string
+          classification:
+            type: string
+          designation:
+            type: string
+          average_height:
+            type: string
+          skin_colors:
+            type: string
+          hair_colors:
+            type: string
+          eye_colors:
+            type: string
+          average_lifespan:
+            type: string
+          homeworld:
+            type: string
+          language:
+            type: string
+          people:
+            type: array
+            items:
+              type: string
+          films:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = species_service.get_species(species_id)
     if data:

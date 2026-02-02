@@ -28,6 +28,21 @@ def get_people():
     responses:
       200:
         description: List of people
+        schema:
+          properties:
+            count:
+              type: integer
+              description: Total number of results
+            next:
+              type: string
+              description: URL of the next page
+            previous:
+              type: string
+              description: URL of the previous page
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Person'
       500:
         description: Internal server error
     """
@@ -55,8 +70,54 @@ def get_person(person_id):
     responses:
       200:
         description: Person details
+        schema:
+          $ref: '#/definitions/Person'
       404:
         description: Person not found
+    definitions:
+      Person:
+        type: object
+        properties:
+          name:
+            type: string
+          height:
+            type: string
+          mass:
+            type: string
+          hair_color:
+            type: string
+          skin_color:
+            type: string
+          eye_color:
+            type: string
+          birth_year:
+            type: string
+          gender:
+            type: string
+          homeworld:
+            type: string
+          films:
+            type: array
+            items:
+              type: string
+          species:
+            type: array
+            items:
+              type: string
+          vehicles:
+            type: array
+            items:
+              type: string
+          starships:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = people_service.get_person(person_id)
     if data:

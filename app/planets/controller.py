@@ -25,6 +25,18 @@ def get_planets():
     responses:
       200:
         description: List of planets
+        schema:
+          properties:
+            count:
+              type: integer
+            next:
+              type: string
+            previous:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Planet'
     """
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search')
@@ -50,8 +62,46 @@ def get_planet(planet_id):
     responses:
       200:
         description: Planet details
+        schema:
+          $ref: '#/definitions/Planet'
       404:
         description: Planet not found
+    definitions:
+      Planet:
+        type: object
+        properties:
+          name:
+            type: string
+          rotation_period:
+            type: string
+          orbital_period:
+            type: string
+          diameter:
+            type: string
+          climate:
+            type: string
+          gravity:
+            type: string
+          terrain:
+            type: string
+          surface_water:
+            type: string
+          population:
+            type: string
+          residents:
+            type: array
+            items:
+              type: string
+          films:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = planets_service.get_planet(planet_id)
     if data:

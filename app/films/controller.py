@@ -25,6 +25,18 @@ def get_films():
     responses:
       200:
         description: List of films
+        schema:
+          properties:
+            count:
+              type: integer
+            next:
+              type: string
+            previous:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Film'
     """
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search')
@@ -50,8 +62,52 @@ def get_film(film_id):
     responses:
       200:
         description: Film details
+        schema:
+          $ref: '#/definitions/Film'
       404:
         description: Film not found
+    definitions:
+      Film:
+        type: object
+        properties:
+          title:
+            type: string
+          episode_id:
+            type: integer
+          opening_crawl:
+            type: string
+          director:
+            type: string
+          producer:
+            type: string
+          release_date:
+            type: string
+          characters:
+            type: array
+            items:
+              type: string
+          planets:
+            type: array
+            items:
+              type: string
+          starships:
+            type: array
+            items:
+              type: string
+          vehicles:
+            type: array
+            items:
+              type: string
+          species:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = films_service.get_film(film_id)
     if data:

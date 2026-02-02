@@ -25,6 +25,18 @@ def get_vehicles():
     responses:
       200:
         description: List of vehicles
+        schema:
+          properties:
+            count:
+              type: integer
+            next:
+              type: string
+            previous:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Vehicle'
     """
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search')
@@ -50,8 +62,50 @@ def get_vehicle(vehicle_id):
     responses:
       200:
         description: Vehicle details
+        schema:
+          $ref: '#/definitions/Vehicle'
       404:
         description: Vehicle not found
+    definitions:
+      Vehicle:
+        type: object
+        properties:
+          name:
+            type: string
+          model:
+            type: string
+          manufacturer:
+            type: string
+          cost_in_credits:
+            type: string
+          length:
+            type: string
+          max_atmosphering_speed:
+            type: string
+          crew:
+            type: string
+          passengers:
+            type: string
+          cargo_capacity:
+            type: string
+          consumables:
+            type: string
+          vehicle_class:
+            type: string
+          pilots:
+            type: array
+            items:
+              type: string
+          films:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = vehicles_service.get_vehicle(vehicle_id)
     if data:

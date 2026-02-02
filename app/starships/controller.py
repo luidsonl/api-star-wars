@@ -25,6 +25,18 @@ def get_starships():
     responses:
       200:
         description: List of starships
+        schema:
+          properties:
+            count:
+              type: integer
+            next:
+              type: string
+            previous:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Starship'
     """
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search')
@@ -50,8 +62,54 @@ def get_starship(starship_id):
     responses:
       200:
         description: Starship details
+        schema:
+          $ref: '#/definitions/Starship'
       404:
         description: Starship not found
+    definitions:
+      Starship:
+        type: object
+        properties:
+          name:
+            type: string
+          model:
+            type: string
+          manufacturer:
+            type: string
+          cost_in_credits:
+            type: string
+          length:
+            type: string
+          max_atmosphering_speed:
+            type: string
+          crew:
+            type: string
+          passengers:
+            type: string
+          cargo_capacity:
+            type: string
+          consumables:
+            type: string
+          hyperdrive_rating:
+            type: string
+          MGLT:
+            type: string
+          starship_class:
+            type: string
+          pilots:
+            type: array
+            items:
+              type: string
+          films:
+            type: array
+            items:
+              type: string
+          created:
+            type: string
+          edited:
+            type: string
+          url:
+            type: string
     """
     data = starships_service.get_starship(starship_id)
     if data:

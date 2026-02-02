@@ -20,7 +20,15 @@ app.config['SWAGGER'] = {
         'url': 'http://www.apache.org/licenses/LICENSE-2.0.html',
     },
     'version': '1.0.0',
-    'specs_route': '/apidocs/'
+    'specs_route': '/apidocs/',
+    'securityDefinitions': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer {token}"'
+        }
+    }
 }
 
 swagger = Swagger(app)

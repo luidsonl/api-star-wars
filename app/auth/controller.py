@@ -19,22 +19,9 @@ def register():
     parameters:
       - in: body
         name: body
+        required: true
         schema:
-          id: UserRegistration
-          required:
-            - email
-            - password
-            - name
-          properties:
-            email:
-              type: string
-              description: User's email address
-            password:
-              type: string
-              description: User's password
-            name:
-              type: string
-              description: User's full name
+          $ref: '#/definitions/UserRegistration'
     responses:
       201:
         description: User created successfully
@@ -45,7 +32,11 @@ def register():
             message:
               type: string
       400:
-        description: Invalid input or validation error
+        description: Invalid input or user already exists
+        schema:
+          properties:
+            error:
+              type: string
     """
     try:
         data = request.get_json()
@@ -82,16 +73,9 @@ def login():
     parameters:
       - in: body
         name: body
+        required: true
         schema:
-          id: UserLogin
-          required:
-            - email
-            - password
-          properties:
-            email:
-              type: string
-            password:
-              type: string
+          $ref: '#/definitions/UserLogin'
     responses:
       200:
         description: Login successful, returns JWT token
@@ -102,7 +86,34 @@ def login():
       401:
         description: Invalid email or password
       400:
-        description: Invalid input
+        description: Invalid input or missing data
+    definitions:
+      UserRegistration:
+        type: object
+        required:
+          - email
+          - password
+          - name
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            minLength: 6
+          name:
+            type: string
+      UserLogin:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
     """
     try:
         data = request.get_json()

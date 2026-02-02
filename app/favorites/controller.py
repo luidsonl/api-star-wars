@@ -24,13 +24,7 @@ def get_favorites(user_id):
         schema:
           type: array
           items:
-            properties:
-              id:
-                type: string
-              entity_type:
-                type: string
-              entity_id:
-                type: string
+            $ref: '#/definitions/Favorite'
       401:
         description: Unauthorized
     """
@@ -50,17 +44,9 @@ def add_favorite(user_id):
     parameters:
       - in: body
         name: body
+        required: true
         schema:
-          id: FavoriteCreate
-          required:
-            - entity_type
-            - entity_id
-          properties:
-            entity_type:
-              type: string
-              enum: [people, planets, vehicles]
-            entity_id:
-              type: string
+          $ref: '#/definitions/FavoriteCreate'
     responses:
       201:
         description: Favorite added
@@ -114,10 +100,36 @@ def delete_favorite(user_id, favorite_id):
     responses:
       200:
         description: Favorite removed
+        schema:
+          properties:
+            message:
+              type: string
       401:
         description: Unauthorized
       404:
         description: Favorite not found or not owned by user
+    definitions:
+      Favorite:
+        type: object
+        properties:
+          id:
+            type: string
+          entity_type:
+            type: string
+            enum: [people, planets, vehicles]
+          entity_id:
+            type: string
+      FavoriteCreate:
+        type: object
+        required:
+          - entity_type
+          - entity_id
+        properties:
+          entity_type:
+            type: string
+            enum: [people, planets, vehicles]
+          entity_id:
+            type: string
     """
     success = favorite_service.remove_favorite(favorite_id, user_id)
     if success:

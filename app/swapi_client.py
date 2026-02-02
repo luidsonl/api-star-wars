@@ -12,26 +12,26 @@ class SWAPIClient:
 
     def get_by_url(self, url: str, substitute: bool = True) -> dict:
         """
-        Generic method to fetch data from any SWAPI URL, with caching.
+        Método genérico para buscar dados de qualquer URL da SWAPI, com cache.
         """
-        # Ensure trailing slash for swapi.dev consistency if it's an entity URL
+        # Certifica que a URL termina com / se não tiver ?
         if not url.endswith('/') and '?' not in url:
             url += '/'
 
-        # Check cache first
+        # Verifica o cache primeiro
         cached_data = self.cache_repo.get_cached_response(url)
         if cached_data:
             return self._substitute_urls(cached_data) if substitute else cached_data
 
-        # Cache miss: Fetch from API
+        # Cache miss: Busca na API
         try:
             response = requests.get(url)
             if response.status_code == 200:
                 data = response.json()
-                # Store in cache
+                # Armazena no cache
                 self.cache_repo.cache_response(url, data)
                 
-                # Substitute URLs in the response
+                # Substitui URLs na resposta
                 return self._substitute_urls(data) if substitute else data
             return None
         except requests.RequestException:
@@ -39,27 +39,27 @@ class SWAPIClient:
 
     def _substitute_urls(self, data):
         """
-        Recursively replaces SWAPI_BASE_URL with the current host URL or makes it relative.
+        Substitui recursivamente SWAPI_BASE_URL pelo URL base atual ou o torna relativo.
         """
         if not data:
             return data
 
-        # Determine target base URL
+        # Determina a URL base
         if has_request_context():
-            # If we are in a request context, use the url_root (e.g., http://localhost:8080/prefix/)
+            # Se estivermos em um contexto de requisição, usa o url_root (ex: http://localhost:8080/prefix/)
             target_base = request.url_root.rstrip('/')
         else:
-            # Fallback for non-request contexts (e.g., tests, scripts)
+            # Fallback para contextos sem requisição (ex: testes, scripts)
             target_base = ""
 
         def _replace(val):
             if isinstance(val, str) and val.startswith(SWAPI_BASE_URL):
-                # Replace SWAPI_BASE_URL with target_base
-                # We need to handle the case where target_base is empty (relative URLs)
+                # Substitui SWAPI_BASE_URL por target_base
+                # Precisamos lidar com o caso em que target_base está vazio (URLs relativas)
                 path = val[len(SWAPI_BASE_URL):]
                 if target_base:
                     return f"{target_base}{path}"
-                return path.lstrip('/') # Return relative path
+                return path.lstrip('/') # Retorna caminho relativo
             elif isinstance(val, list):
                 return [_replace(i) for i in val]
             elif isinstance(val, dict):
@@ -70,7 +70,7 @@ class SWAPIClient:
 
     def get_entity(self, entity_type: str, entity_id: str) -> dict:
         """
-        Get a specific entity by type and ID.
+        Pega uma entidade específica por tipo e ID.
         """
         if entity_type not in self.VALID_TYPES:
             raise ValueError(f"Invalid entity type: {entity_type}. Must be one of {self.VALID_TYPES}")
@@ -80,7 +80,7 @@ class SWAPIClient:
 
     def get_all_entities(self, entity_type: str) -> list:
         """
-        Fetch all entities of a given type by traversing all pages.
+        Busca todas as entidades de um determinado tipo percorrendo todas as páginas.
         """
         if entity_type not in self.VALID_TYPES:
             raise ValueError(f"Invalid entity type: {entity_type}")
@@ -98,11 +98,11 @@ class SWAPIClient:
         return all_results
 
     def _parse_numeric(self, value):
-        """Helper to parse SWAPI values like '172' or '77' to float for sorting."""
+        """Helper para converter valores SWAPI como '172' ou '77' para float para ordenação."""
         if value is None or value in ['unknown', 'n/a', 'none']:
-            return float('-inf')  # Put unknown values at the end (or beginning depending on order)
+            return float('-inf')  # Coloca valores desconhecidos no final (ou início dependendo da ordem)
         try:
-            # Handle values like "1,000" or "unknown"
+            # Lida com valores como "1,000" ou "unknown"
             clean_value = str(value).replace(',', '')
             return float(clean_value)
         except ValueError:
@@ -110,8 +110,8 @@ class SWAPIClient:
 
     def list_entities(self, entity_type: str, page: int = 1, search: str = None, sort_by: str = None) -> dict:
         """
-        List entities with support for pagination, search, and sorting.
-        If sort_by is provided, fetches all entities to perform sorting.
+        Lista entidades com suporte a paginação, busca e ordenação.
+        Se sort_by for fornecido, busca todas as entidades para realizar a ordenação.
         """
         if entity_type not in self.VALID_TYPES:
             raise ValueError(f"Invalid entity type: {entity_type}. Must be one of {self.VALID_TYPES}")
@@ -119,21 +119,21 @@ class SWAPIClient:
         if sort_by:
             results = self.get_all_entities(entity_type)
             
-            # Apply search if provided
+            # Aplica busca se fornecida
             if search:
                 search = search.lower()
                 results = [r for r in results if search in str(r.get('name', r.get('title', ''))).lower()]
 
-            # Apply sorting
+            # Aplica ordenação
             if results and sort_by in results[0]:
                 results.sort(key=lambda x: self._parse_numeric(x.get(sort_by)))
 
-            # Paginate the sorted results manually
+            # Pagina os resultados ordenados manualmente
             page_size = 10
             start = (page - 1) * page_size
             end = start + page_size
             
-            # Construct full URLs for next/previous links so they can be substituted correctly
+            # Constrói URLs completas para os links next/previous para que possam ser substituídas corretamente
             next_url = None
             if end < len(results):
                 next_url = f"{SWAPI_BASE_URL}/{entity_type}/?page={page + 1}"
@@ -156,7 +156,7 @@ class SWAPIClient:
             }
             return self._substitute_urls(data)
 
-        # Standard pagination (server-side)
+        # Paginação padrão (server-side)
         url = f"{SWAPI_BASE_URL}/{entity_type}/?page={page}"
         if search:
             url += f"&search={search}"

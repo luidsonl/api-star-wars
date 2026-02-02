@@ -3,15 +3,15 @@ from unittest.mock import MagicMock
 from app.auth.service import AuthService
 
 def test_register_success(client, mock_db):
-    # Get the collection mock that UserService already has
+    # Obtém a coleção mock que o UserService já possui
     mock_collection = mock_db.collection.return_value
     
-    # Mock get_user_by_email to return None (user doesn't exist)
-    # UserService uses self.collection.where('email', '==', email).limit(1).stream()
+    # Mock get_user_by_email para retornar None (usuário não existe)
+    # UserService usa self.collection.where('email', '==', email).limit(1).stream()
     mock_query = mock_collection.where.return_value.limit.return_value
     mock_query.stream.return_value = []
     
-    # Mock add to return (None, mock_doc)
+    # Mock add para retornar (None, mock_doc)
     mock_doc = MagicMock()
     mock_doc.id = "test-user-id"
     mock_collection.add.return_value = (None, mock_doc)
@@ -26,7 +26,7 @@ def test_register_success(client, mock_db):
     assert response.json['id'] == "test-user-id"
 
 def test_login_success(client, mock_db):
-    # Get the collection mock that UserService already has
+    # Obtém a coleção mock que o UserService já possui
     mock_collection = mock_db.collection.return_value
     
     hashed_password = AuthService.hash_password("pass123")

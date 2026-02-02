@@ -7,11 +7,11 @@ class SWAPICacheRepository:
         self.collection = (database or db).collection('swapi_cache')
 
     def _get_url_hash(self, url: str) -> str:
-        """Generates a SHA-256 hash of the URL to use as document ID."""
+        """Gera um hash SHA-256 da URL para usar como ID do documento."""
         return hashlib.sha256(url.encode('utf-8')).hexdigest()
 
     def get_cached_response(self, url: str) -> dict:
-        """Retrieves a cached response by URL. Returns None if not found."""
+        """Recupera uma resposta em cache pela URL. Retorna None se não encontrada."""
         doc_id = self._get_url_hash(url)
         doc_ref = self.collection.document(doc_id)
         doc = doc_ref.get()
@@ -21,7 +21,7 @@ class SWAPICacheRepository:
         return None
 
     def cache_response(self, url: str, data: dict):
-        """Stores a SWAPI response in the cache."""
+        """Armazena uma resposta da SWAPI no cache."""
         doc_id = self._get_url_hash(url)
         doc_ref = self.collection.document(doc_id)
         

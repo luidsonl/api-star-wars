@@ -37,7 +37,7 @@ def handle_exception(e):
     
     traceback.print_exc()
     
-    # Use the status code of the HTTP error if it is one
+    # Use o código de status do erro HTTP se for um
     code = 500
     if isinstance(e, HTTPException):
         code = e.code
@@ -54,7 +54,7 @@ def handle_exception(e):
     return jsonify(response), code
 
 if __name__ == "__main__":
-    # This is used when running locally only. When deploying to Google Cloud
-    # Run, a webserver process such as Gunicorn will serve the app.
+    # Isto é usado apenas quando executado localmente. Ao implantar no Google Cloud
+    # Run, um processo de servidor web como o Gunicorn servirá o app.
     import os
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)

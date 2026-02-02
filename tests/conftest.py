@@ -2,18 +2,18 @@ import pytest
 import os
 from unittest.mock import MagicMock, patch
 
-# 1. SET ENVIRONMENT VARIABLES FIRST
+# 1. DEFINE AS VARIÁVEIS DE AMBIENTE PRIMEIRO
 os.environ["GOOGLE_CLOUD_PROJECT"] = "test-project"
 os.environ["JWT_SECRET_KEY"] = "star-wars-test-secret-key-long-enough-for-sha256"
 
-# 2. MOCK FIRESTORE BEFORE ANY APP IMPORT
+# 2. MOCK FIRESTORE ANTES DE QUALQUER IMPORTAÇÃO DO APP
 mock_firestore_client_instance = MagicMock()
 
-# Patch the Client class
+# Deixa o mock do firestore disponível
 firestore_patcher = patch('google.cloud.firestore.Client', return_value=mock_firestore_client_instance)
 firestore_patcher.start()
 
-# 3. FORCE PATCH THE DB INSTANCE IN THE CORE MODULES
+# 3. FORÇA O PATCH DA INSTÂNCIA DO DB NOS MÓDULOS CORE
 def force_patch_db():
     try:
         import app.database.core
@@ -45,12 +45,12 @@ def mock_db():
 
 @pytest.fixture(autouse=True)
 def patch_controllers(mock_db):
-    # This is necessary because services are instantiated at module level in controllers
+    # Isto é necessário porque os serviços são instanciados no nível do módulo nos controladores
     from app.user.service import UserService
     from app.favorites.service import FavoriteService
     
     with patch('app.swapi_client.SWAPICacheRepository') as mock_cache_repo:
-        # Ensure cache misses by default in all E2E tests
+        # Garante que o cache falhe por padrão em todos os testes E2E
         mock_cache_repo.return_value.get_cached_response.return_value = None
         
         # Create fresh services with the mock_db and the patched SWAPICacheRepository

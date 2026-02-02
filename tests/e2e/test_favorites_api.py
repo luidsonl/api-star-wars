@@ -4,16 +4,16 @@ import requests_mock
 from app.auth.service import AuthService
 
 def test_add_favorite_success(client, mock_db):
-    # Register and get token
+    # Registra e obtém o token
     user_id = "test-user-id"
     token = AuthService.generate_token(user_id)
     headers = {"Authorization": f"Bearer {token}"}
     
-    # Get the collection mock
+    # Obtém a coleção mock
     mock_collection = mock_db.collection.return_value
     
-    # Mock check if already exists
-    # FavoriteService uses: self.collection.where(...).where(...).where(...).limit(1).stream()
+    # Mock checa se já existe
+    # FavoriteService usa: self.collection.where(...).where(...).where(...).limit(1).stream()
     mock_query = mock_collection.where.return_value.where.return_value.where.return_value.limit.return_value
     mock_query.stream.return_value = []
     
@@ -39,7 +39,7 @@ def test_list_favorites_success(client, mock_db):
     token = AuthService.generate_token(user_id)
     headers = {"Authorization": f"Bearer {token}"}
     
-    # Get the collection mock
+    # Obtém a coleção mock
     mock_collection = mock_db.collection.return_value
     
     mock_fav_doc = MagicMock()

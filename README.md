@@ -1,6 +1,47 @@
 # Star Wars API
 
-API for managing Star Wars characters and user favorites. Built with Flask and Google Cloud Firestore.
+API que funciona como camada de abstração e cache para a API do Star Wars (https://swapi.dev/).
+
+## Funcionalidades
+
+A API oferece uma interface robusta para acessar dados do universo Star Wars, com as seguintes características:
+
+- **Abstração da SWAPI**: Camada de proxy para todos os recursos da [SWAPI](https://swapi.dev/) (Filmes, Pessoas, Planetas, Espécies, Naves e Veículos).
+- **Cache Inteligente**: Sistema de cache utilizando **Google Firestore**. Antes de cada requisição, a URL é convertida em um hash **SHA-256** usado como identificador único para buscar dados já armazenados, evitando chamadas desnecessárias à API original.
+- **Autenticação Segura**: Implementação de autenticação via **JWT (JSON Web Tokens)** para proteção de rotas.
+- **Gestão de Favoritos**: Permite que usuários autenticados salvem e gerenciem seus recursos favoritos.
+- **Busca e Ordenação**: Suporte a filtragem e ordenação de dados em diversos endpoints.
+- **Documentação Interativa**: Swagger UI completo para exploração e teste da API.
+
+---
+
+## Arquitetura do Projeto
+
+O projeto segue uma arquitetura **Modular** e **Baseada em Serviços**, visando escalabilidade e facilidade de manutenção.
+
+### Padrão de Organização
+A estrutura é organizada por domínios de negócio (módulos), onde cada módulo é encapsulado:
+
+```text
+app/
+├── auth/            # Gestão de tokens e identidade
+├── favorites/       # Lógica de marcadores do usuário
+├── films/           # Dados sobre os filmes
+├── people/          # Informações sobre personagens
+├── ...              # Outros domínios (planets, species, etc.)
+├── database/        # Configurações e repositórios Firestore
+└── swapi_client.py  # Cliente de integração com a API externa
+```
+
+### Componentes Principais
+1.  **Controllers (Blueprints)**: Definem as rotas e manipulam as requisições HTTP utilizando Flask Blueprints.
+2.  **Services**: Contêm a lógica de negócio e as regras de filtragem/transformação de dados.
+3.  **Client/Cache**: O `SWAPIClient` gerencia a comunicação com a API original, integrando-se automaticamente com a camada de cache no Firestore.
+4.  **Database**: Camada de persistência que utiliza Firestore para armazenar usuários, favoritos e dados cacheados.
+
+![arquitetura](./doc/diagrama-1.png)
+
+---
 
 ## Como rodar localmente
 
@@ -15,7 +56,7 @@ Para executar o projeto em sua máquina local, siga os passos abaixo:
 Inicie o emulador do Firestore em um terminal separado:
 
 ```bash
-gcloud emulators firestore start
+gcloud emulators firestore start --host-port=127.0.0.1:8700
 ```
 
 > [!NOTE]
@@ -33,6 +74,45 @@ A API estará disponível em `http://localhost:8080`.
 
 ---
 
+## Endpoints da API
+
+Abaixo estão os principais endpoints disponíveis. Para detalhes completos sobre os esquemas de dados, utilize o [Swagger UI](http://localhost:8080/apidocs/).
+
+### Autenticação
+Endpoints para gestão de acesso:
+- `POST /auth/register`: Cria uma nova conta de usuário.
+- `POST /auth/login`: Autentica o usuário e retorna um token JWT.
+
+### Favoritos (Requer Autenticação)
+Gerencie seus recursos favoritos (inclua o token no header `Authorization: Bearer <TOKEN>`):
+- `GET /favorites/`: Lista todos os favoritos do usuário logado.
+- `POST /favorites/`: Adiciona um novo favorito (especifique `entity_type` e `entity_id`).
+- `DELETE /favorites/<fav_id>`: Remove um favorito específico.
+
+### Recursos Star Wars (SWAPI)
+Interfaces para buscar dados da SWAPI original. Todos os endpoints de listagem aceitam parâmetros de busca e ordenação.
+
+#### Endpoints Disponíveis:
+- `/people/` e `/people/<id>`
+- `/films/` e `/films/<id>`
+- `/planets/` e `/planets/<id>`
+- `/species/` e `/species/<id>`
+- `/starships/` e `/starships/<id>`
+- `/vehicles/` e `/vehicles/<id>`
+
+#### Parâmetros de Query (Listagem):
+- `page`: Número da página (ex: `?page=2`).
+- `search`: Busca textual (ex: `?search=luke`).
+- **`sort_by`**: Ordena os resultados pelo campo especificado (ex: `?sort_by=name`).
+
+#### Exemplo de Uso:
+Para listar personagens ordenados pelo nome:
+```bash
+GET http://localhost:8080/people/?sort_by=name
+```
+
+---
+
 ## Documentação (Swagger)
 
 A API possui documentação interativa utilizando Swagger (OpenAPI).
@@ -42,6 +122,7 @@ Para acessar, certifique-se de que a API está rodando e acesse:
 **[http://localhost:8080/apidocs/](http://localhost:8080/apidocs/)**
 
 Nesta interface, você pode:
+
 - Visualizar todos os endpoints disponíveis.
 - Consultar esquemas de entrada e saída.
 - Testar as requisições diretamente pelo navegador.

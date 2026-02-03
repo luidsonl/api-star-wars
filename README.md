@@ -41,6 +41,22 @@ app/
 
 ![arquitetura](./doc/diagrama-1.png)
 
+### Uso de DTOs (Data Transfer Objects)
+
+O projeto utiliza **DTOs** em conjunto com a biblioteca **Pydantic** para garantir a integridade e a validação dos dados que trafegam na API.
+
+- **Validação Strict**: Uso de tipos como `EmailStr` e `Literal` para validar entradas (ex: `UserCreateDTO`, `FavoriteCreateDTO`).
+- **Contrato de Interface**: Separação clara entre os dados recebidos pelo cliente e os modelos internos.
+- **Segurança**: Modelos de resposta (ex: `UserResponseDTO`) garantem que campos sensíveis não sejam expostos.
+
+Exemplo de DTO de criação de usuário:
+```python
+class UserCreateDTO(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    name: str
+```
+
 ---
 
 ## Como rodar localmente

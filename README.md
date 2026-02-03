@@ -80,8 +80,8 @@ Abaixo estão os principais endpoints disponíveis. Para detalhes completos sobr
 
 ### Autenticação e Usuário
 Endpoints para gestão de acesso e perfil:
-- `POST /auth/register`: Cria uma nova conta de usuário.
-- `POST /auth/login`: Autentica o usuário e retorna um token JWT.
+- `POST /auth/register`: Cria uma nova conta e retorna o token JWT e dados do usuário.
+- `POST /auth/login`: Autentica o usuário e retorna o token JWT e dados do usuário.
 - `GET /users/me`: Retorna os dados do usuário autenticado (Requer Token).
 
 ### Favoritos (Requer Autenticação)

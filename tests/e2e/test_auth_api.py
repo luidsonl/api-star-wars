@@ -24,6 +24,9 @@ def test_register_success(client, mock_db):
     
     assert response.status_code == 201
     assert response.json['id'] == "test-user-id"
+    assert "token" in response.json
+    assert response.json['user']['email'] == "test@example.com"
+    assert response.json['user']['name'] == "Test User"
 
 def test_login_success(client, mock_db):
     # Obtém a coleção mock que o UserService já possui
@@ -49,3 +52,5 @@ def test_login_success(client, mock_db):
     
     assert response.status_code == 200
     assert "token" in response.json
+    assert response.json['user']['email'] == "test@example.com"
+    assert response.json['user']['name'] == "Test User"

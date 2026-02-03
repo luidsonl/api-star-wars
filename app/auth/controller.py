@@ -31,6 +31,10 @@ def register():
               type: string
             message:
               type: string
+            token:
+              type: string
+            user:
+              $ref: '#/definitions/UserProfile'
       400:
         description: Invalid input or user already exists
         schema:
@@ -57,7 +61,17 @@ def register():
         )
         
         user_id = user_service.create_user(new_user)
-        return jsonify({"id": user_id, "message": "User created successfully"}), 201
+        token = auth_service.generate_token(user_id)
+        return jsonify({
+            "id": user_id, 
+            "message": "User created successfully",
+            "token": token,
+            "user": {
+                "id": user_id,
+                "email": new_user.email,
+                "name": new_user.name
+            }
+        }), 201
     except ValidationError as e:
         return jsonify(e.errors()), 400
     except ValueError as e:
@@ -78,16 +92,27 @@ def login():
           $ref: '#/definitions/UserLogin'
     responses:
       200:
-        description: Login successful, returns JWT token
+        description: Login successful, returns JWT token and user data
         schema:
           properties:
             token:
               type: string
+            user:
+              $ref: '#/definitions/UserProfile'
       401:
         description: Invalid email or password
       400:
         description: Invalid input or missing data
     definitions:
+      UserProfile:
+        type: object
+        properties:
+          id:
+            type: string
+          email:
+            type: string
+          name:
+            type: string
       UserRegistration:
         type: object
         required:
@@ -127,6 +152,13 @@ def login():
             return jsonify({"error": "Invalid email or password"}), 401
         
         token = auth_service.generate_token(user.id)
-        return jsonify({"token": token}), 200
+        return jsonify({
+            "token": token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name
+            }
+        }), 200
     except ValidationError as e:
         return jsonify(e.errors()), 400

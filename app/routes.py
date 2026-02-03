@@ -8,8 +8,10 @@ from app.species.controller import species_bp
 from app.starships.controller import starships_bp
 from app.vehicles.controller import vehicles_bp
 from app.user.controller import user_bp
+from app.about.controller import about_bp
 
 def register_routes(app: Flask):
+    app.register_blueprint(about_bp, url_prefix='/')
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(favorites_bp, url_prefix='/favorites')
     app.register_blueprint(people_bp, url_prefix='/people')

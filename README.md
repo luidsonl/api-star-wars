@@ -78,10 +78,11 @@ A API estará disponível em `http://localhost:8080`.
 
 Abaixo estão os principais endpoints disponíveis. Para detalhes completos sobre os esquemas de dados, utilize o [Swagger UI](http://localhost:8080/apidocs/).
 
-### Autenticação
-Endpoints para gestão de acesso:
+### Autenticação e Usuário
+Endpoints para gestão de acesso e perfil:
 - `POST /auth/register`: Cria uma nova conta de usuário.
 - `POST /auth/login`: Autentica o usuário e retorna um token JWT.
+- `GET /users/me`: Retorna os dados do usuário autenticado (Requer Token).
 
 ### Favoritos (Requer Autenticação)
 Gerencie seus recursos favoritos (inclua o token no header `Authorization: Bearer <TOKEN>`):

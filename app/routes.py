@@ -7,6 +7,7 @@ from app.planets.controller import planets_bp
 from app.species.controller import species_bp
 from app.starships.controller import starships_bp
 from app.vehicles.controller import vehicles_bp
+from app.user.controller import user_bp
 
 def register_routes(app: Flask):
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -17,4 +18,5 @@ def register_routes(app: Flask):
     app.register_blueprint(species_bp, url_prefix='/species')
     app.register_blueprint(starships_bp, url_prefix='/starships')
     app.register_blueprint(vehicles_bp, url_prefix='/vehicles')
+    app.register_blueprint(user_bp, url_prefix='/users')
 

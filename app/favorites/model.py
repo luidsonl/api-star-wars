@@ -5,7 +5,7 @@ from typing import Optional
 class Favorite:
     id: Optional[str]
     user_id: str
-    entity_type: str  # 'people', 'planets', 'vehicles'
+    entity_type: str 
     entity_id: str
 
     def to_dict(self):

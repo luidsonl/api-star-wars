@@ -116,7 +116,7 @@ def delete_favorite(user_id, favorite_id):
             type: string
           entity_type:
             type: string
-            enum: [people, planets, vehicles]
+            enum: ['people', 'planets', 'vehicles', 'films', 'species', 'starships']
           entity_id:
             type: string
       FavoriteCreate:
@@ -127,7 +127,7 @@ def delete_favorite(user_id, favorite_id):
         properties:
           entity_type:
             type: string
-            enum: [people, planets, vehicles]
+            enum: ['people', 'planets', 'vehicles', 'films', 'species', 'starships']
           entity_id:
             type: string
     """

@@ -73,7 +73,13 @@ def register():
             }
         }), 201
     except ValidationError as e:
-        return jsonify(e.errors()), 400
+        error_messages = []
+        for error in e.errors():
+            field = error['loc'][-1]
+            message = error['msg']
+            error_messages.append(f"Field '{field}': {message}")
+        
+        return jsonify({"error": "Validation Error", "details": error_messages}), 400
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 

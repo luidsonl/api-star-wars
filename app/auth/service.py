@@ -19,7 +19,7 @@ class AuthService:
 
     @staticmethod
     def generate_token(user_id: str) -> str:
-        now = datetime.datetime.now(datetime.UTC)
+        now = datetime.datetime.now(datetime.timezone.utc)
         payload = {
             'exp': now + datetime.timedelta(days=1),
             'iat': now,
